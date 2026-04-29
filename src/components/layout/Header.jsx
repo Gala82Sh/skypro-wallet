@@ -1,7 +1,16 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { getCurrentUser, logout } from '../../services/authService';
 
 function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const currentUser = getCurrentUser();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <header style={styles.header}>
@@ -9,51 +18,22 @@ function Header() {
         <img src="/image/Vector.png" alt="Skypro.Wallet" style={styles.logoImg} />
       </div>
 
-      <div style={styles.navContainer}>
-        <Link
-          to="/"
-          style={location.pathname === '/' ? styles.activeNavLink : styles.navLink}
-          onMouseEnter={(e) => {
-            e.target.style.color = '#7334EA';
-            e.target.style.fontWeight = '600';
-          }}
-          onMouseLeave={(e) => {
-            if (location.pathname !== '/') {
-              e.target.style.color = '#000000';
-              e.target.style.fontWeight = '400';
-            } else {
-              e.target.style.color = '#7334EA';
-              e.target.style.fontWeight = '600';
-            }
-          }}
-        >
-          Мои расходы
-        </Link>
-
-        <Link
-          to="/analytics"
-          style={location.pathname === '/analytics' ? styles.activeNavLink : styles.navLink}
-          onMouseEnter={(e) => {
-            e.target.style.color = '#7334EA';
-            e.target.style.fontWeight = '600';
-          }}
-          onMouseLeave={(e) => {
-            if (location.pathname !== '/analytics') {
-              e.target.style.color = '#000000';
-              e.target.style.fontWeight = '400';
-            } else {
-              e.target.style.color = '#7334EA';
-              e.target.style.fontWeight = '600';
-            }
-          }}
-        >
-          Анализ расходов
-        </Link>
-      </div>
-
-      <Link to="/login" style={styles.logoutLink}>
-        Выйти 
-      </Link>
+      {!isAuthPage && currentUser && (
+        <>
+          <div style={styles.navContainer}>
+            <Link to="/" style={location.pathname === '/' ? styles.activeNavLink : styles.navLink}>
+              Мои расходы
+            </Link>
+            <Link to="/analytics" style={location.pathname === '/analytics' ? styles.activeNavLink : styles.navLink}>
+              Анализ расходов
+            </Link>
+          </div>
+          <div style={styles.userInfo}>
+            <span style={styles.userName}>{currentUser.name}</span>
+            <button onClick={handleLogout} style={styles.logoutButton}>ВЫЙТИ</button>
+          </div>
+        </>
+      )}
     </header>
   );
 }
@@ -98,16 +78,28 @@ const styles = {
     color: '#7334EA',
     textDecoration: 'underline',
   },
-  logoutLink: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '600',
-    fontSize: '14px',
-    lineHeight: '170%',
-    color: '#000000',
-    textDecoration: 'none',
+  userInfo: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '16px',
     position: 'absolute',
     top: '20px',
     right: '120px',
+  },
+  userName: {
+    fontFamily: 'Montserrat, sans-serif',
+    fontWeight: '500',
+    fontSize: '14px',
+    color: '#000000',
+  },
+  logoutButton: {
+    fontFamily: 'Montserrat, sans-serif',
+    fontWeight: '600',
+    fontSize: '14px',
+    color: '#000000',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
   },
 };
 
