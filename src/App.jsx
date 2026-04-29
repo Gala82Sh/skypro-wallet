@@ -1,58 +1,29 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
 import Home from './pages/Home';
-import { Button, Input } from './components/common';
 
 function Login() {
-  return (
-    <div>
-      <h2>Вход в аккаунт</h2>
-      <Input label="Email" type="email" placeholder="example@mail.com" />
-      <Input label="Пароль" type="password" placeholder="••••••••" />
-      <Button variant="primary" onClick={() => alert('Вход')}>
-        Войти
-      </Button>
-    </div>
-  );
+  return <div style={{ padding: '20px' }}>Страница входа</div>;
 }
 
 function Register() {
-  return (
-    <div>
-      <h2>Регистрация</h2>
-      <Input label="Имя" placeholder="Иван" />
-      <Input label="Email" type="email" placeholder="example@mail.com" />
-      <Input label="Пароль" type="password" placeholder="••••••••" />
-      <Button variant="primary" onClick={() => alert('Регистрация')}>
-        Зарегистрироваться
-      </Button>
-    </div>
-  );
+  return <div style={{ padding: '20px' }}>Страница регистрации</div>;
 }
 
 function Analytics() {
-  return (
-    <div>
-      <h2>Аналитика</h2>
-      <p>Здесь будут календарь и диаграмма</p>
-    </div>
-  );
+  return <div style={{ padding: '20px' }}>Страница аналитики</div>;
 }
 
 function App() {
   return (
     <BrowserRouter>
-      <div>
-        <Header />
-        <div style={{ padding: '20px' }}>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/analytics" element={<Analytics />} />
-          </Routes>
-        </div>
-      </div>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/analytics" element={<Analytics />} />
+      </Routes>
     </BrowserRouter>
   );
 }
