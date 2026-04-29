@@ -1,18 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './components/layout/Header';
+import Home from './pages/Home';
 import { Button, Input } from './components/common';
-
-function Home() {
-  return (
-    <div>
-      <h2>Главная страница</h2>
-      <p>Здесь будет таблица расходов</p>
-      <Button variant="primary" onClick={() => alert('Добавить расход')}>
-        Добавить расход
-      </Button>
-    </div>
-  );
-}
 
 function Login() {
   return (
