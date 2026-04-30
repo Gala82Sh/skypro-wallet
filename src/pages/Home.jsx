@@ -54,27 +54,29 @@ function Home() {
     };
     let hasError = false;
 
+    
     if (!form.description.trim()) {
       newErrors.description = 'Введите описание расхода';
       hasError = true;
     }
 
+   
     if (!form.category) {
       newErrors.category = 'Выберите категорию';
       hasError = true;
     }
 
+    
+    const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
     if (!form.date) {
       newErrors.date = 'Введите дату';
       hasError = true;
-    }
-
-    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    if (form.date && !dateRegex.test(form.date)) {
-      newErrors.date = 'Введите дату';
+    } else if (!dateRegex.test(form.date)) {
+      newErrors.date = 'Введите дату)';
       hasError = true;
     }
 
+    
     const amountNum = Number(form.amount);
     if (!form.amount) {
       newErrors.amount = 'Введите сумму';
@@ -93,7 +95,7 @@ function Home() {
       id: Date.now(),
       description: form.description.trim(),
       category: form.category,
-      date: form.date.split('-').reverse().join('.'),
+      date: form.date, 
       amount: amountNum,
     };
 
@@ -181,7 +183,7 @@ function Home() {
             name="date"
             value={form.date}
             onChange={handleChange}
-            placeholder="Введите дату"
+            placeholder="ДД.ММ.ГГГГ"
             error={errors.date}
             required
           />
