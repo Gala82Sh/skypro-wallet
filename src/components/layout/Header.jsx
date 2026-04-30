@@ -14,9 +14,9 @@ function Header() {
 
   return (
     <header style={styles.header}>
-      <div style={styles.logo}>
-        <img src="/image/Vector.png" alt="Skypro.Wallet" style={styles.logoImg} />
-      </div>
+      <Link to="/" style={styles.logoLink}>
+  <img src="/image/Vector.svg" alt="Skypro.Wallet" style={styles.logoImg} />
+</Link>
 
       {!isAuthPage && currentUser && (
         <>
@@ -30,7 +30,7 @@ function Header() {
           </div>
           <div style={styles.userInfo}>
             <span style={styles.userName}>{currentUser.name}</span>
-            <button onClick={handleLogout} style={styles.logoutButton}>ВЫЙТИ</button>
+            <button onClick={handleLogout} style={styles.logoutButton}>Выйти</button>
           </div>
         </>
       )}
@@ -101,6 +101,8 @@ const styles = {
     border: 'none',
     cursor: 'pointer',
   },
+
+  
 };
 
 export default Header;

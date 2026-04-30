@@ -2,21 +2,26 @@ import React from 'react';
  
 function Input({ label, type = 'text', value, onChange, placeholder, error, required = false }) { 
   const inputStyle = { 
-    width: '100%%', 
-    padding: '10px 12px', 
-    fontSize: '16px', 
-    border: '1px solid ' + (error ? '#dc3545' : '#ccc'), 
-    borderRadius: '6px', 
-    outline: 'none', 
-    boxSizing: 'border-box', 
+    width: '100%',
+  height: '39px',
+  padding: '12px',
+  fontSize: '14px',
+  border: '0.5px solid ' + (error ? '#dc3545' : '#999999'),
+  borderRadius: '6px',
+  outline: 'none',
+  boxSizing: 'border-box',
+  fontFamily: 'Montserrat, sans-serif',
   }; 
  
   const labelStyle = { 
-    display: 'block', 
-    marginBottom: '6px', 
-    fontSize: '14px', 
-    fontWeight: '500', 
-    color: error ? '#dc3545' : '#333', 
+    display: 'block',
+  marginBottom: '6px',
+  fontFamily: 'Montserrat, sans-serif',
+  fontWeight: '600',
+  fontSize: '16px',
+  lineHeight: '100%',
+  letterSpacing: '0px',
+  color: error ? '#dc3545' : '#000000',
   }; 
  
   const errorStyle = { 

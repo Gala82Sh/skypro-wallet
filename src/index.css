@@ -1,0 +1,20 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #F4F5F6;
+  font-family: 'Montserrat', sans-serif;
+}
+
+
+.calendar-scroll {
+  max-height: 380px;
+  overflow-y: auto;
+  overflow-x: hidden;  
+  scrollbar-width: thin;
+  scrollbar-color: #D9D9D9 transparent;
+  padding-right: 4px;
+}

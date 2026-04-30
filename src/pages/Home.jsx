@@ -1,11 +1,7 @@
 import { useState } from 'react';
-import trashIcon from '/image/icon.png';
-import foodIcon from '/image/food.png';
-import carIcon from '/image/car.png';
-import houseIcon from '/image/house.png';
-import entertIcon from '/image/entert.png';
-import schoolIcon from '/image/school.png';
-import otherIcon from '/image/other.png';
+import trashIcon from '/image/icon.svg';
+import { CATEGORIES } from '../constants/categories';
+import Input from '../components/common/Input';
 
 const initialExpenses = [
   { id: 1, description: 'Пятерочка', category: 'Еда', date: '03.07.2024', amount: 3500 },
@@ -16,7 +12,6 @@ const initialExpenses = [
   { id: 6, description: 'Кофейня №1', category: 'Еда', date: '02.07.2024', amount: 400 },
   { id: 7, description: 'Бильярд', category: 'Развлечения', date: '29.06.2024', amount: 600 },
   { id: 8, description: 'Перекресток', category: 'Еда', date: '29.06.2024', amount: 2360 },
- 
 ];
 
 function Home() {
@@ -27,31 +22,84 @@ function Home() {
     date: '',
     amount: '',
   });
+  
+  const [errors, setErrors] = useState({
+    description: '',
+    category: '',
+    date: '',
+    amount: '',
+  });
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    if (errors[name]) {
+      setErrors({ ...errors, [name]: '' });
+    }
   };
 
   const handleCategoryClick = (category) => {
     setForm({ ...form, category });
+    if (errors.category) {
+      setErrors({ ...errors, category: '' });
+    }
   };
 
   const handleAdd = () => {
-    if (!form.description || !form.category || !form.date || !form.amount) {
-      alert('Заполните все поля');
+    const newErrors = {
+      description: '',
+      category: '',
+      date: '',
+      amount: '',
+    };
+    let hasError = false;
+
+    if (!form.description.trim()) {
+      newErrors.description = 'Введите описание расхода';
+      hasError = true;
+    }
+
+    if (!form.category) {
+      newErrors.category = 'Выберите категорию';
+      hasError = true;
+    }
+
+    if (!form.date) {
+      newErrors.date = 'Введите дату';
+      hasError = true;
+    }
+
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (form.date && !dateRegex.test(form.date)) {
+      newErrors.date = 'Введите дату';
+      hasError = true;
+    }
+
+    const amountNum = Number(form.amount);
+    if (!form.amount) {
+      newErrors.amount = 'Введите сумму';
+      hasError = true;
+    } else if (isNaN(amountNum) || amountNum <= 0) {
+      newErrors.amount = 'Сумма должна быть положительным числом';
+      hasError = true;
+    }
+
+    if (hasError) {
+      setErrors(newErrors);
       return;
     }
 
     const newExpense = {
       id: Date.now(),
-      description: form.description,
+      description: form.description.trim(),
       category: form.category,
       date: form.date.split('-').reverse().join('.'),
-      amount: Number(form.amount),
+      amount: amountNum,
     };
 
     setExpenses([newExpense, ...expenses]);
     setForm({ description: '', category: '', date: '', amount: '' });
+    setErrors({ description: '', category: '', date: '', amount: '' });
   };
 
   const handleDelete = (id) => {
@@ -62,7 +110,6 @@ function Home() {
     <div style={styles.page}>
       <h1 style={styles.pageTitle}>Мои расходы</h1>
 
-      {}
       <div style={styles.leftTable}>
         <div style={styles.tableCard}>
           <div style={styles.tableTitle}>Таблица расходов</div>
@@ -91,67 +138,65 @@ function Home() {
         </div>
       </div>
 
-      {}
       <div style={styles.rightTable}>
         <div style={styles.formCard}>
           <div style={styles.formTitle}>Новый расход</div>
 
-          <div style={styles.fieldGroup}>
-            <label style={styles.label}>Описание</label>
-            <input name="description" value={form.description} onChange={handleChange} style={styles.input} />
+          <Input
+            label="Описание"
+            type="text"
+            name="description"
+            value={form.description}
+            onChange={handleChange}
+            placeholder="Введите описание"
+            error={errors.description}
+            required
+          />
+
+          <label style={styles.categoryLabel}>Категория</label>
+          <div style={{ ...styles.categoriesContainer, marginBottom: '24px', marginTop: '8px' }}>
+            {[0, 2, 4].map((startIdx) => (
+              <div key={startIdx} style={styles.categoriesRow}>
+                {CATEGORIES.slice(startIdx, startIdx + 2).map((cat) => (
+                  <button
+                    key={cat.id}
+                    style={{
+                      ...styles.categoryButton,
+                      border: form.category === cat.name ? '2px solid #7334EA' : 'none',
+                    }}
+                    onClick={() => handleCategoryClick(cat.name)}
+                  >
+                    <img src={cat.icon} alt={cat.name} style={styles.categoryIcon} />
+                    <span>{cat.name}</span>
+                  </button>
+                ))}
+              </div>
+            ))}
+            {errors.category && <div style={{ color: '#dc3545', fontSize: '12px', marginTop: '4px' }}>{errors.category}</div>}
           </div>
 
-          {}
-          <div style={{ ...styles.categoriesContainer, marginBottom: '24px', marginTop: '24px' }}>
-            <div style={styles.categoriesRow}>
-              <button style={styles.categoryButton} onClick={() => handleCategoryClick('Еда')}>
-                <img src={foodIcon} alt="Еда" style={styles.categoryIcon} />
-                <span>Еда</span>
-              </button>
-              <button style={styles.categoryButton} onClick={() => handleCategoryClick('Транспорт')}>
-                <img src={carIcon} alt="Транспорт" style={styles.categoryIcon} />
-                <span>Транспорт</span>
-              </button>
-            </div>
-            <div style={styles.categoriesRow}>
-              <button style={styles.categoryButton} onClick={() => handleCategoryClick('Жилые')}>
-                <img src={houseIcon} alt="Жилые" style={styles.categoryIcon} />
-                <span>Жилые</span>
-              </button>
-              <button style={styles.categoryButton} onClick={() => handleCategoryClick('Развлечения')}>
-                <img src={entertIcon} alt="Развлечения" style={styles.categoryIcon} />
-                <span>Развлечения</span>
-              </button>
-            </div>
-            <div style={styles.categoriesRow}>
-              <button style={styles.categoryButton} onClick={() => handleCategoryClick('Образование')}>
-                <img src={schoolIcon} alt="Образование" style={styles.categoryIcon} />
-                <span>Образование</span>
-              </button>
-              <button style={styles.categoryButton} onClick={() => handleCategoryClick('Другое')}>
-                <img src={otherIcon} alt="Другое" style={styles.categoryIcon} />
-                <span>Другое</span>
-              </button>
-            </div>
-          </div>
+          <Input
+            label="Дата"
+            type="text"
+            name="date"
+            value={form.date}
+            onChange={handleChange}
+            placeholder="Введите дату"
+            error={errors.date}
+            required
+          />
 
-          {}
-          <div style={{ marginBottom: '24px' }}>
-            <div style={styles.fieldGroup}>
-              <label style={styles.label}>Дата</label>
-              <input type="text" name="date" value={form.date} onChange={handleChange} placeholder="Введите дату" style={styles.input} />
-            </div>
-          </div>
+          <Input
+            label="Сумма"
+            type="number"
+            name="amount"
+            value={form.amount}
+            onChange={handleChange}
+            placeholder="Введите сумму"
+            error={errors.amount}
+            required
+          />
 
-          {}
-          <div style={{ marginBottom: '24px' }}>
-            <div style={styles.fieldGroup}>
-              <label style={styles.label}>Сумма</label>
-              <input type="number" name="amount" value={form.amount} onChange={handleChange} placeholder="Введите сумму" style={styles.input} />
-            </div>
-          </div>
-
-          {}
           <button style={{ ...styles.button, marginTop: '24px' }} onClick={handleAdd}>
             Добавить новый расход
           </button>
@@ -165,7 +210,6 @@ const styles = {
   page: {
     width: '1440px',
     margin: '0 auto',
-    backgroundColor: '#F4F5F6',
     minHeight: '100vh',
     position: 'relative',
   },
@@ -268,11 +312,23 @@ const styles = {
     margin: '0 auto 24px auto',
     marginLeft: '0',
   },
+  categoryLabel: {
+    width: '313px',
+    height: '20px',
+    fontFamily: 'Montserrat, sans-serif',
+    fontWeight: '600',
+    fontSize: '16px',
+    lineHeight: '100%',
+    letterSpacing: '0px',
+    color: '#000000',
+    marginBottom: '8px',
+    display: 'block',
+  },
   fieldGroup: {
     display: 'flex',
     flexDirection: 'column',
     gap: '8px',
-    marginBottom: '0', 
+    marginBottom: '0',
   },
   label: {
     width: '313px',
@@ -285,11 +341,15 @@ const styles = {
     color: '#000000',
   },
   input: {
+    width: '100%',
+    height: '39px',
     padding: '12px',
     fontSize: '14px',
     border: '0.5px solid #999999',
-    borderRadius: '8px',
+    borderRadius: '6px',
     fontFamily: 'Montserrat, sans-serif',
+    outline: 'none',
+    boxSizing: 'border-box',
   },
   categoriesContainer: {
     display: 'flex',

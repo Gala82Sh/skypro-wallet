@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { CATEGORIES } from '../constants/categories';
 
 function Analytics() {
   const today = new Date();
@@ -17,8 +18,8 @@ function Analytics() {
     { date: '2026-04-29', category: 'Другое', amount: 2306 },
   ];
 
-  const categories = ['Еда', 'Транспорт', 'Жилье', 'Развлечения', 'Образование', 'Другое'];
-  const categoryColors = ['#D9B6FF', '#FFB53D', '#6EE4FE', '#B0AEFF', '#BCEC30', '#FFB9B8'];
+  const categories = CATEGORIES.map(cat => cat.name);
+  const categoryColors = CATEGORIES.map(cat => cat.color);
   const maxHeight = 328;
 
   const [selectedPeriod, setSelectedPeriod] = useState({
@@ -197,12 +198,15 @@ function Analytics() {
                 </span>
               )}
             </div>
+
+            {}
             <div style={styles.weekDaysRow}>
               {weekDays.map(day => <div key={day} style={styles.weekDay}>{day}</div>)}
             </div>
 
-            <div style={styles.monthTitle}>{capitalizedMonth}</div>
-            <div style={styles.calendarGrid}>
+            {}
+            <div className="calendar-scroll" style={{ maxHeight: '380px', overflowY: 'auto', paddingRight: '4px' }}>
+              <div style={styles.monthTitle}>{capitalizedMonth}</div>
               {currentMonthGrid.map((week, weekIdx) => (
                 <div key={weekIdx} style={styles.weekRow} onClick={() => handleWeekClick(week, currentMonth, currentYear)}>
                   {week.map((day, dayIdx) => (
@@ -229,11 +233,9 @@ function Analytics() {
                   ))}
                 </div>
               ))}
-            </div>
 
-            <div style={styles.monthTitle}>{capitalizedNextMonth}</div>
-            <div style={styles.calendarGrid}>
-              {nextMonthGrid.slice(0, 2).map((week, weekIdx) => (
+              <div style={styles.monthTitle}>{capitalizedNextMonth}</div>
+              {nextMonthGrid.map((week, weekIdx) => (
                 <div key={weekIdx} style={styles.weekRow} onClick={() => handleWeekClick(week, nextMonthIndex, nextMonthYear)}>
                   {week.map((day, dayIdx) => (
                     <div
@@ -287,7 +289,6 @@ const styles = {
   page: {
     width: '1440px',
     margin: '0 auto',
-    backgroundColor: '#F4F5F6',
     minHeight: '100vh',
     paddingTop: '100px',
   },
@@ -365,15 +366,11 @@ const styles = {
     marginTop: '24px',
     marginBottom: '16px',
   },
-  calendarGrid: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-  },
   weekRow: {
     display: 'flex',
     gap: '6px',
     cursor: 'pointer',
+    marginBottom: '6px',
   },
   calendarDay: {
     width: '40px',
@@ -413,11 +410,12 @@ const styles = {
   },
   chartContainer: {
     display: 'flex',
-    gap: '12px',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    width: '100%',
-    marginTop: '40px',
+  gap: '12px',
+  justifyContent: 'space-between',
+  alignItems: 'flex-end',
+  width: '100%',
+  height: '100%',  
+  
   },
   barWrapper: {
     display: 'flex',
@@ -425,6 +423,8 @@ const styles = {
     alignItems: 'center',
     gap: '12px',
     width: '94px',
+    justifyContent: 'flex-end',
+    marginBottom: '60px',
   },
   barValue: {
     width: '94px',
