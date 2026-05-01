@@ -1,0 +1,200 @@
+.header {
+  width: 1440px;
+  height: 64px;
+  margin: 0 auto;
+  background-color: #FFFFFF;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+}
+
+.logo {
+  position: absolute;
+  left: 120px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.logo img {
+  width: 143.68px;
+  height: 19px;
+}
+
+.desktopNav {
+  display: flex;
+  gap: 48px;
+}
+
+.link {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 170%;
+  color: #000000;
+  text-decoration: none;
+}
+
+.activeLink {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 170%;
+  color: #7334EA;
+  text-decoration: underline;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.userInfo {
+  position: absolute;
+  right: 120px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.username {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  color: #000000;
+}
+
+.logoutBtn {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: #000000;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dropdownWrapper {
+  position: relative;
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
+  min-width: 160px;
+  z-index: 100;
+  margin-top: 8px;
+}
+
+.dropdownItem {
+  display: block;
+  padding: 10px 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #000000;
+  text-decoration: none;
+}
+
+.dropdownItem:hover {
+  background-color: #F4F5F6;
+}
+
+
+@media (max-width: 768px) {
+  .header {
+    width: 100%;
+    max-width: 375px;
+    background-color: #F4F5F6;
+    height: 54px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  .logo {
+    position: static;
+    left: auto;
+    top: auto;
+    transform: none;
+    order: 1;
+    margin-right: 71px;
+  }
+
+  .logo img {
+    width: 109px;
+    height: 14px;
+  }
+
+  .desktopNav {
+    display: none;
+  }
+
+  .mobileNav {
+    order: 2;
+    margin-right: 20px;
+  }
+
+  .activeLink {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 18px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 150%;
+    color: #7334EA;
+    text-decoration: underline;
+    background: none;
+    border: none;
+    white-space: nowrap;
+  }
+
+  .arrow {
+    width: 7px;
+    height: 7px;
+    display: inline-block;
+    background-image: url("data:image/svg+xml,%3Csvg width='7' height='7' viewBox='0 0 7 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0L3.5 7L7 0H0Z' fill='black'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+
+  .userInfo {
+    position: static;
+    right: auto;
+    top: auto;
+    transform: none;
+    order: 3;
+    gap: 20px;
+  }
+
+  .username {
+    display: none;
+  }
+
+  .logoutBtn {
+    font-size: 12px;
+  }
+
+  .dropdown {
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 180px;
+    top: calc(100% + 8px);
+  }
+
+  .dropdownItem {
+    text-align: center;
+  }
+}

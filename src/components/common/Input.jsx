@@ -15,7 +15,7 @@ function Input({ label, type = 'text', name, value, onChange, placeholder, error
 
   const labelStyle = {
     display: 'block',
-    marginBottom: '6px',
+    marginBottom: '16px',  
     fontFamily: 'Montserrat, sans-serif',
     fontWeight: '600',
     fontSize: '16px',

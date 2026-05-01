@@ -1,108 +1,60 @@
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { getCurrentUser, logout } from '../../services/authService';
+import { useState } from 'react';
+import { useLocation, Link } from 'react-router-dom';
+import styles from './Header.module.css';
 
 function Header() {
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const location = useLocation();
-  const navigate = useNavigate();
-  const currentUser = getCurrentUser();
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+  
+  const isMobile = window.innerWidth <= 768;
+  const isAddExpensePage = location.pathname === '/add-expense';
+  const buttonText = isAddExpensePage ? 'Новый расход' : 'Мои расходы';
 
   return (
-    <header style={styles.header}>
-      <Link to="/" style={styles.logoLink}>
-  <img src="/image/Vector.svg" alt="Skypro.Wallet" style={styles.logoImg} />
-</Link>
+    <header className={styles.header}>
+      <Link to="/" className={styles.logo}>
+        <img alt="Skypro.Wallet" src="/image/Vector.svg" />
+      </Link>
 
-      {!isAuthPage && currentUser && (
-        <>
-          <div style={styles.navContainer}>
-            <Link to="/" style={location.pathname === '/' ? styles.activeNavLink : styles.navLink}>
-              Мои расходы
-            </Link>
-            <Link to="/analytics" style={location.pathname === '/analytics' ? styles.activeNavLink : styles.navLink}>
-              Анализ расходов
-            </Link>
-          </div>
-          <div style={styles.userInfo}>
-            <span style={styles.userName}>{currentUser.name}</span>
-            <button onClick={handleLogout} style={styles.logoutButton}>Выйти</button>
-          </div>
-        </>
+      {}
+      {!isMobile && (
+        <div className={styles.desktopNav}>
+          <Link to="/" className={location.pathname === '/' ? styles.activeLink : styles.link}>
+            Мои расходы
+          </Link>
+          <Link to="/analytics" className={location.pathname === '/analytics' ? styles.activeLink : styles.link}>
+            Анализ расходов
+          </Link>
+        </div>
       )}
+
+      {}
+      {isMobile && (
+        <div className={styles.mobileNav}>
+          <div className={styles.dropdownWrapper}>
+            <button 
+              className={styles.activeLink}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            >
+              <span>{buttonText}</span>
+              <span className={`${styles.arrow} ${isDropdownOpen ? styles.arrowUp : ''}`}></span>
+            </button>
+            {isDropdownOpen && (
+              <div className={styles.dropdown}>
+                <Link to="/" className={styles.dropdownItem}>Мои расходы</Link>
+                <Link to="/analytics" className={styles.dropdownItem}>Анализ расходов</Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      <div className={styles.userInfo}>
+        {!isMobile && !isAddExpensePage && <span className={styles.username}>test</span>}
+        <button className={styles.logoutBtn}>Выйти</button>
+      </div>
     </header>
   );
 }
-
-const styles = {
-  header: {
-    width: '1440px',
-    height: '64px',
-    margin: '0 auto',
-    backgroundColor: '#FFFFFF',
-    position: 'relative',
-  },
-  logo: {
-    position: 'absolute',
-    top: '23px',
-    left: '120px',
-  },
-  logoImg: {
-    width: '143.68px',
-    height: '19px',
-  },
-  navContainer: {
-    display: 'flex',
-    gap: '48px',
-    position: 'absolute',
-    top: '20px',
-    left: '583px',
-  },
-  navLink: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '400',
-    fontSize: '14px',
-    lineHeight: '170%',
-    color: '#000000',
-    textDecoration: 'none',
-  },
-  activeNavLink: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '600',
-    fontSize: '14px',
-    lineHeight: '170%',
-    color: '#7334EA',
-    textDecoration: 'underline',
-  },
-  userInfo: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '16px',
-    position: 'absolute',
-    top: '20px',
-    right: '120px',
-  },
-  userName: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '500',
-    fontSize: '14px',
-    color: '#000000',
-  },
-  logoutButton: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '600',
-    fontSize: '14px',
-    color: '#000000',
-    background: 'none',
-    border: 'none',
-    cursor: 'pointer',
-  },
-
-  
-};
 
 export default Header;

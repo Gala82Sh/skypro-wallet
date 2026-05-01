@@ -2,6 +2,8 @@ import { useState } from 'react';
 import trashIcon from '/image/icon.svg';
 import { CATEGORIES } from '../constants/categories';
 import Input from '../components/common/Input';
+import styles from './Home.module.css';
+import { useNavigate } from 'react-router-dom';
 
 const initialExpenses = [
   { id: 1, description: 'Пятерочка', category: 'Еда', date: '03.07.2024', amount: 3500 },
@@ -15,6 +17,7 @@ const initialExpenses = [
 ];
 
 function Home() {
+  const navigate = useNavigate(); 
   const [expenses, setExpenses] = useState(initialExpenses);
   const [form, setForm] = useState({
     description: '',
@@ -29,6 +32,9 @@ function Home() {
     date: '',
     amount: '',
   });
+
+  
+  const [selectedExpenseId, setSelectedExpenseId] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -54,29 +60,25 @@ function Home() {
     };
     let hasError = false;
 
-    
     if (!form.description.trim()) {
       newErrors.description = 'Введите описание расхода';
       hasError = true;
     }
 
-   
     if (!form.category) {
       newErrors.category = 'Выберите категорию';
       hasError = true;
     }
 
-    
     const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
     if (!form.date) {
       newErrors.date = 'Введите дату';
       hasError = true;
     } else if (!dateRegex.test(form.date)) {
-      newErrors.date = 'Введите дату)';
+      newErrors.date = 'Введите дату';
       hasError = true;
     }
 
-    
     const amountNum = Number(form.amount);
     if (!form.amount) {
       newErrors.amount = 'Введите сумму';
@@ -95,7 +97,7 @@ function Home() {
       id: Date.now(),
       description: form.description.trim(),
       category: form.category,
-      date: form.date, 
+      date: form.date,
       amount: amountNum,
     };
 
@@ -104,45 +106,75 @@ function Home() {
     setErrors({ description: '', category: '', date: '', amount: '' });
   };
 
-  const handleDelete = (id) => {
+  
+  const handleRowClick = (id) => {
+    setSelectedExpenseId(selectedExpenseId === id ? null : id);
+  };
+
+  
+  const confirmDelete = (id) => {
     setExpenses(expenses.filter((expense) => expense.id !== id));
+    setSelectedExpenseId(null);
   };
 
   return (
-    <div style={styles.page}>
-      <h1 style={styles.pageTitle}>Мои расходы</h1>
+    <div className={styles.page}>
+      <div className={styles.pageTitle}>
+        <span>Мои расходы</span>
+        <button className={styles.mobileAddButton} onClick={() => navigate('/add-expense')}>
+          <div className={styles.mobileAddIcon}>+</div>
+          <span className={styles.mobileAddLabel}>Новый расход</span>
+        </button>
+      </div>
 
-      <div style={styles.leftTable}>
-        <div style={styles.tableCard}>
-          <div style={styles.tableTitle}>Таблица расходов</div>
+      <div className={styles.leftTable}>
+        <div className={styles.tableCard}>
+          <div className={styles.tableTitle}>Таблица расходов</div>
 
-          <div style={styles.headerRow}>
-            <div style={{ width: '250px' }}>Описание</div>
-            <div style={{ width: '120px' }}>Категория</div>
-            <div style={{ width: '100px' }}>Дата</div>
-            <div style={{ width: '100px' }}>Сумма</div>
-            <div style={{ width: '40px' }}></div>
+          <div className={styles.headerRow}>
+            <div className={styles.headerCell}>Описание</div>
+            <div className={styles.headerCell}>Категория</div>
+            <div className={styles.headerCell}>Дата</div>
+            <div className={styles.headerCell}>Сумма</div>
+            <div className={styles.headerCell}></div>
           </div>
 
-          <div style={styles.tableBody}>
+          <div className={styles.tableBody}>
             {expenses.map((exp) => (
-              <div key={exp.id} style={styles.row}>
-                <div style={{ width: '250px' }}>{exp.description}</div>
-                <div style={{ width: '120px' }}>{exp.category}</div>
-                <div style={{ width: '100px' }}>{exp.date}</div>
-                <div style={{ width: '100px' }}>{exp.amount.toLocaleString()} ₽</div>
-                <div style={{ width: '40px', cursor: 'pointer' }} onClick={() => handleDelete(exp.id)}>
-                  <img src={trashIcon} alt="Удалить" style={{ width: '20px', height: '20px' }} />
-                </div>
+              <div key={exp.id}>
+               <div 
+  className={styles.row} 
+  onClick={() => handleRowClick(exp.id)}
+>
+  <div className={styles.cell}>{exp.description}</div>
+  <div className={styles.cell}>{exp.category}</div>
+  <div className={styles.cell}>{exp.date}</div>
+  <div className={styles.cell}>{exp.amount.toLocaleString()} ₽</div>
+  <div className={styles.cell} onClick={(e) => { e.stopPropagation(); confirmDelete(exp.id); }}>
+    <img src={trashIcon} alt="Удалить" style={{ width: '20px', height: '20px' }} />
+  </div>
+</div>
+                
+                {}
+                {selectedExpenseId === exp.id && (
+                  <div className={styles.deleteRow}>
+                    <button 
+                      className={styles.deleteButton} 
+                      onClick={() => confirmDelete(exp.id)}
+                    >
+                      Удалить расход
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div style={styles.rightTable}>
-        <div style={styles.formCard}>
-          <div style={styles.formTitle}>Новый расход</div>
+      <div className={styles.rightTable}>
+        <div className={styles.formCard}>
+          <div className={styles.formTitle}>Новый расход</div>
 
           <Input
             label="Описание"
@@ -155,25 +187,34 @@ function Home() {
             required
           />
 
-          <label style={styles.categoryLabel}>Категория</label>
-          <div style={{ ...styles.categoriesContainer, marginBottom: '24px', marginTop: '8px' }}>
-            {[0, 2, 4].map((startIdx) => (
-              <div key={startIdx} style={styles.categoriesRow}>
-                {CATEGORIES.slice(startIdx, startIdx + 2).map((cat) => (
+          <label className={styles.categoryLabel}>Категория</label>
+          <div className={styles.categoriesContainer}>
+            <div className={styles.categoriesGrid}>
+              {CATEGORIES.map((cat) => {
+                let buttonWidth = 'auto';
+                if (cat.name === 'Еда') buttonWidth = '89px';
+                if (cat.name === 'Транспорт') buttonWidth = '133px';
+                if (cat.name === 'Жилье') buttonWidth = '109px';
+                if (cat.name === 'Развлечения') buttonWidth = '149px';
+                if (cat.name === 'Образование') buttonWidth = '152px';
+                if (cat.name === 'Другое') buttonWidth = '111px';
+
+                return (
                   <button
                     key={cat.id}
+                    className={styles.categoryButton}
                     style={{
-                      ...styles.categoryButton,
+                      width: buttonWidth,
                       border: form.category === cat.name ? '2px solid #7334EA' : 'none',
                     }}
                     onClick={() => handleCategoryClick(cat.name)}
                   >
-                    <img src={cat.icon} alt={cat.name} style={styles.categoryIcon} />
+                    <img src={cat.icon} alt={cat.name} className={styles.categoryIcon} />
                     <span>{cat.name}</span>
                   </button>
-                ))}
-              </div>
-            ))}
+                );
+              })}
+            </div>
             {errors.category && <div style={{ color: '#dc3545', fontSize: '12px', marginTop: '4px' }}>{errors.category}</div>}
           </div>
 
@@ -183,7 +224,7 @@ function Home() {
             name="date"
             value={form.date}
             onChange={handleChange}
-            placeholder="ДД.ММ.ГГГГ"
+            placeholder="Введите дату"
             error={errors.date}
             required
           />
@@ -199,203 +240,21 @@ function Home() {
             required
           />
 
-          <button style={{ ...styles.button, marginTop: '24px' }} onClick={handleAdd}>
+          <button className={styles.button} onClick={handleAdd}>
             Добавить новый расход
           </button>
         </div>
       </div>
+
+      {}
+      <div className={styles.fabContainer}>
+        <button className={styles.fab} onClick={() => navigate('/add-expense')}>
+          <span className={styles.fabPlus}>+</span>
+        </button>
+        <span className={styles.fabLabel}>Новый расход</span>
+      </div>
     </div>
   );
 }
-
-const styles = {
-  page: {
-    width: '1440px',
-    margin: '0 auto',
-    minHeight: '100vh',
-    position: 'relative',
-  },
-  pageTitle: {
-    position: 'absolute',
-    top: '100px',
-    left: '120px',
-    width: '233px',
-    height: '48px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '700',
-    fontSize: '32px',
-    lineHeight: '150%',
-    letterSpacing: '0px',
-    color: '#000000',
-    margin: 0,
-  },
-  leftTable: {
-    position: 'absolute',
-    top: '180px',
-    left: '118px',
-    width: '789px',
-    height: '618px',
-  },
-  tableCard: {
-    width: '789px',
-    height: '618px',
-    backgroundColor: '#FFFFFF',
-    borderRadius: '30px',
-    padding: '32px',
-    boxSizing: 'border-box',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  tableTitle: {
-    width: '238px',
-    height: '29px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '700',
-    fontSize: '24px',
-    lineHeight: '100%',
-    letterSpacing: '0px',
-    textAlign: 'center',
-    color: '#000000',
-    marginLeft: '0',
-    marginBottom: '24px',
-  },
-  headerRow: {
-    display: 'flex',
-    gap: '32px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '400',
-    fontSize: '12px',
-    lineHeight: '100%',
-    color: '#999999',
-    borderBottom: '1px solid #EEEEEE',
-    paddingBottom: '8px',
-    marginBottom: '8px',
-  },
-  tableBody: {
-    flex: 1,
-    overflowY: 'auto',
-  },
-  row: {
-    display: 'flex',
-    gap: '32px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '400',
-    fontSize: '14px',
-    color: '#000000',
-    padding: '10px 0',
-  },
-  rightTable: {
-    position: 'absolute',
-    top: '180px',
-    left: '941px',
-    width: '379px',
-    height: '618px',
-  },
-  formCard: {
-    width: '379px',
-    height: '618px',
-    backgroundColor: '#FFFFFF',
-    borderRadius: '30px',
-    padding: '32px',
-    boxSizing: 'border-box',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  formTitle: {
-    width: '186px',
-    height: '29px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '700',
-    fontSize: '24px',
-    lineHeight: '100%',
-    letterSpacing: '0px',
-    color: '#000000',
-    textAlign: 'center',
-    margin: '0 auto 24px auto',
-    marginLeft: '0',
-  },
-  categoryLabel: {
-    width: '313px',
-    height: '20px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '600',
-    fontSize: '16px',
-    lineHeight: '100%',
-    letterSpacing: '0px',
-    color: '#000000',
-    marginBottom: '8px',
-    display: 'block',
-  },
-  fieldGroup: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '8px',
-    marginBottom: '0',
-  },
-  label: {
-    width: '313px',
-    height: '20px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '600',
-    fontSize: '16px',
-    lineHeight: '100%',
-    letterSpacing: '0px',
-    color: '#000000',
-  },
-  input: {
-    width: '100%',
-    height: '39px',
-    padding: '12px',
-    fontSize: '14px',
-    border: '0.5px solid #999999',
-    borderRadius: '6px',
-    fontFamily: 'Montserrat, sans-serif',
-    outline: 'none',
-    boxSizing: 'border-box',
-  },
-  categoriesContainer: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '6px',
-    width: '277px',
-  },
-  categoriesRow: {
-    display: 'flex',
-    gap: '6px',
-  },
-  categoryButton: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: '12px',
-    padding: '8px 20px',
-    backgroundColor: '#F4F5F6',
-    borderRadius: '30px',
-    border: 'none',
-    cursor: 'pointer',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '400',
-    fontSize: '12px',
-    lineHeight: '100%',
-    letterSpacing: '0px',
-    color: '#000000',
-    textAlign: 'center',
-  },
-  categoryIcon: {
-    width: '20px',
-    height: '20px',
-  },
-  button: {
-    padding: '12px',
-    backgroundColor: '#7334EA',
-    color: '#FFFFFF',
-    border: 'none',
-    borderRadius: '8px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '600',
-    fontSize: '14px',
-    cursor: 'pointer',
-  },
-};
 
 export default Home;

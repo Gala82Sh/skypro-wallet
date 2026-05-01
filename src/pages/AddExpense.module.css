@@ -1,0 +1,191 @@
+.page {
+  width: 1440px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  background-color: #F4F5F6;
+}
+
+
+.navBack {
+  position: absolute;
+  top: 26px;
+  left: 120px;
+}
+
+.backLink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.backIcon {
+  width: 11.66px;
+  height: 11.67px;
+}
+
+.backText {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 150%;
+  letter-spacing: 0px;
+  color: #999999;
+  white-space: nowrap;
+}
+
+.backText:hover {
+  text-decoration: underline;
+}
+
+.formCard {
+  position: absolute;
+  top: 180px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 379px;
+  background-color: #FFFFFF;
+  border-radius: 30px;
+  padding: 32px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.formTitle {
+  width: 186px;
+  height: 29px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 100%;
+  letter-spacing: 0px;
+  color: #000000;
+  text-align: center;
+  margin: 0 auto 24px auto;
+}
+
+.categoryLabel {
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  color: #000000;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.categoriesContainer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 24px;
+  margin-top: 8px;
+}
+
+.categoriesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 379px;
+}
+
+.categoryButton {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 8px 20px;
+  background-color: #F4F5F6;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 100%;
+  color: #000000;
+  white-space: nowrap;
+  height: 31px;
+}
+
+.categoryIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.button {
+  padding: 12px;
+  background-color: #7334EA;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 24px;
+}
+
+
+@media (max-width: 768px) {
+  .page {
+    width: 100%;
+    background-color: #FFFFFF;
+  }
+
+  .navBack {
+    position: static;
+    padding: 20px 16px 0 16px;
+    margin-bottom: 12px;
+  }
+
+  .formCard {
+    position: static;
+    width: 100%;
+    transform: none;
+    padding: 0 16px 24px 16px;
+    border-radius: 0;
+    background-color: transparent;
+  }
+
+  .formTitle {
+    display: block;
+    width: 186px;
+    height: 29px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 100%;
+    letter-spacing: 0px;
+    color: #000000;
+    text-align: left;
+    margin: 0 0 24px 0;
+  }
+
+  .categoriesGrid {
+    gap: 8px;
+  }
+
+ 
+  .categoryButton {
+    padding: 8px 16px;
+    font-size: 11px;
+    width: auto !important;
+  }
+
+  .categoryIcon {
+    width: 18px;
+    height: 18px;
+  }
+
+  .button {
+    width: 100%;
+    margin-top: 16px;
+  }
+}
+
