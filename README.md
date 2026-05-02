@@ -14,3 +14,5 @@ git clone <ссылка на репозиторий>
 cd skypro-wallet
 npm install
 npm run dev
+
+> Все критерии выполнены.
