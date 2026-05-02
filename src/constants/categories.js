@@ -13,7 +13,7 @@ export const CATEGORIES = [
   },
   {
     id: 'housing',
-    name: 'Жилые',
+    name: 'Жилье',
     icon: '/image/house.svg',
     color: '#6EE4FE',
   },

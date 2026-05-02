@@ -4,16 +4,17 @@ import { CATEGORIES } from '../constants/categories';
 import Input from '../components/common/Input';
 import styles from './Home.module.css';
 import { useNavigate } from 'react-router-dom';
+import { transactionsApi } from '../services/transactionsApi';
 
 const initialExpenses = [
-  { id: 1, description: 'Пятерочка', category: 'Еда', date: '03.07.2024', amount: 3500 },
-  { id: 2, description: 'Индекс Такси', category: 'Транспорт', date: '03.07.2024', amount: 730 },
-  { id: 3, description: 'Аптека Вита', category: 'Другое', date: '03.07.2024', amount: 1200 },
-  { id: 4, description: 'Бургер Кинг', category: 'Еда', date: '03.07.2024', amount: 950 },
-  { id: 5, description: 'Деливери', category: 'Еда', date: '02.07.2024', amount: 1320 },
-  { id: 6, description: 'Кофейня №1', category: 'Еда', date: '02.07.2024', amount: 400 },
-  { id: 7, description: 'Бильярд', category: 'Развлечения', date: '29.06.2024', amount: 600 },
-  { id: 8, description: 'Перекресток', category: 'Еда', date: '29.06.2024', amount: 2360 },
+  { id: 1, description: 'Пятерочка', category: 'Еда', date: '03.04.2026', amount: 3500 },
+  { id: 2, description: 'Индекс Такси', category: 'Транспорт', date: '29.04.2026', amount: 730 },
+  { id: 3, description: 'Аптека Вита', category: 'Другое', date: '30.04.2026', amount: 1200 },
+  { id: 4, description: 'Бургер Кинг', category: 'Еда', date: '01.05.2026', amount: 950 },
+  { id: 5, description: 'Деливери', category: 'Еда', date: '01.05.2026', amount: 1320 },
+  { id: 6, description: 'Кофейня №1', category: 'Еда', date: '30.04.2026', amount: 400 },
+  { id: 7, description: 'Бильярд', category: 'Развлечения', date: '27.04.2026', amount: 600 },
+  { id: 8, description: 'Перекресток', category: 'Еда', date: '29.04.2026', amount: 2360 },
 ];
 
 function Home() {
@@ -33,16 +34,18 @@ function Home() {
   });
   const [selectedExpenseId, setSelectedExpenseId] = useState(null);
 
- 
+  
   useEffect(() => {
-    const saved = localStorage.getItem('expenses');
-    if (saved) {
-      setExpenses(JSON.parse(saved));
+    const saved = transactionsApi.getAll();
+    if (saved.length > 0) {
+      setExpenses(saved);
     } else {
       setExpenses(initialExpenses);
+      localStorage.setItem('expenses', JSON.stringify(initialExpenses));
     }
   }, []);
 
+  
   useEffect(() => {
     if (expenses.length > 0) {
       localStorage.setItem('expenses', JSON.stringify(expenses));
@@ -114,9 +117,8 @@ function Home() {
       amount: amountNum,
     };
 
-    const updatedExpenses = [newExpense, ...expenses];
+    const updatedExpenses = transactionsApi.add(newExpense);
     setExpenses(updatedExpenses);
-    localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
 
     setForm({ description: '', category: '', date: '', amount: '' });
     setErrors({ description: '', category: '', date: '', amount: '' });
@@ -127,9 +129,8 @@ function Home() {
   };
 
   const confirmDelete = (id) => {
-    const updatedExpenses = expenses.filter((expense) => expense.id !== id);
+    const updatedExpenses = transactionsApi.remove(id);
     setExpenses(updatedExpenses);
-    localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
     setSelectedExpenseId(null);
   };
 

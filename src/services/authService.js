@@ -1,4 +1,3 @@
-
 const USERS_KEY = 'skypro_wallet_users';
 const CURRENT_USER_KEY = 'skypro_wallet_current_user';
 

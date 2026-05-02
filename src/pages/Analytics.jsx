@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CATEGORIES } from '../constants/categories';
+import { transactionsApi } from '../services/transactionsApi';
 
 function Analytics() {
   const navigate = useNavigate();
@@ -21,19 +22,12 @@ function Analytics() {
 
   const weekDays = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
 
- 
   const [expenses, setExpenses] = useState([]);
 
+  
   useEffect(() => {
-    const saved = localStorage.getItem('expenses');
-    if (saved) setExpenses(JSON.parse(saved));
-    else {
-      setExpenses([
-        { id: 1, description: 'Пятерочка', category: 'Еда', date: '03.07.2024', amount: 3500 },
-        { id: 2, description: 'Индекс Такси', category: 'Транспорт', date: '03.07.2024', amount: 730 },
-        { id: 3, description: 'Аптека Вита', category: 'Другое', date: '03.07.2024', amount: 1200 },
-      ]);
-    }
+    const saved = transactionsApi.getAll();
+    setExpenses(saved);
   }, []);
 
  
@@ -41,18 +35,20 @@ function Analytics() {
     startDate: new Date(currentYear, currentMonth, currentDay),
     endDate: new Date(currentYear, currentMonth, currentDay),
   });
-
   const [rangeStart, setRangeStart] = useState(null);
   const [isSelectingRange, setIsSelectingRange] = useState(false);
 
-  
+  const categories = CATEGORIES.map(cat => cat.name);
+  const categoryColors = CATEGORIES.map(cat => cat.color);
+  const maxHeight = 328;
+
+ 
   const getExpensesForPeriod = () => {
     if (!selectedPeriod) return [];
     const start = new Date(selectedPeriod.startDate);
     const end = new Date(selectedPeriod.endDate);
     start.setHours(0, 0, 0, 0);
     end.setHours(23, 59, 59, 999);
-
     return expenses.filter(exp => {
       const [day, month, year] = exp.date.split('.');
       const expDate = new Date(`${year}-${month}-${day}`);
@@ -61,11 +57,6 @@ function Analytics() {
   };
 
   const filteredExpenses = getExpensesForPeriod();
-
-  const categories = CATEGORIES.map(cat => cat.name);
-  const categoryColors = CATEGORIES.map(cat => cat.color);
-  const maxHeight = 328;
-
   const categoryAmounts = categories.map(cat =>
     filteredExpenses.filter(exp => exp.category === cat).reduce((sum, exp) => sum + exp.amount, 0)
   );
@@ -81,12 +72,13 @@ function Analytics() {
     if (!selectedPeriod) return 'выберите период';
     const start = selectedPeriod.startDate;
     const end = selectedPeriod.endDate;
-    if (start.toDateString() === end.toDateString())
+    if (start.toDateString() === end.toDateString()) {
       return `${start.getDate()} ${start.toLocaleString('ru', { month: 'long' })} ${start.getFullYear()} г.`;
+    }
     return `${start.getDate()} – ${end.getDate()} ${end.toLocaleString('ru', { month: 'long' })} ${end.getFullYear()} г.`;
   };
 
-  
+ 
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
   const getFirstDayIndex = (year, month) => {
     const firstDay = new Date(year, month, 1).getDay();
@@ -265,7 +257,7 @@ const styles = {
   totalLabel: { fontFamily: 'Montserrat, sans-serif', fontWeight: '400', fontSize: '14px', color: '#999999', marginBottom: '24px' },
   chartContainer: { display: 'flex', gap: '12px', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', height: '100%' },
   barWrapper: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', width: '94px', justifyContent: 'flex-end', marginBottom: '60px' },
-  barValue: { fontFamily: 'Montserrat, sans-serif', fontWeight: '600', fontSize: '16px', textAlign: 'center', color: '#000000', marginBottom: '4px' },
+  barValue: { width: '94px', fontFamily: 'Montserrat, sans-serif', fontWeight: '600', fontSize: '16px', textAlign: 'center', color: '#000000', marginBottom: '4px' },
   bar: { width: '94px', borderRadius: '12px', transition: 'height 0.3s ease' },
   barLabel: { fontFamily: 'Montserrat, sans-serif', fontWeight: '400', fontSize: '12px', textAlign: 'center', color: '#000000' },
 };
