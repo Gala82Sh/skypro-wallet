@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import trashIcon from '/image/icon.svg';
 import { CATEGORIES } from '../constants/categories';
 import Input from '../components/common/Input';
@@ -17,24 +17,37 @@ const initialExpenses = [
 ];
 
 function Home() {
-  const navigate = useNavigate(); 
-  const [expenses, setExpenses] = useState(initialExpenses);
+  const navigate = useNavigate();
+  const [expenses, setExpenses] = useState([]);
   const [form, setForm] = useState({
     description: '',
     category: '',
     date: '',
     amount: '',
   });
-  
   const [errors, setErrors] = useState({
     description: '',
     category: '',
     date: '',
     amount: '',
   });
-
-  
   const [selectedExpenseId, setSelectedExpenseId] = useState(null);
+
+ 
+  useEffect(() => {
+    const saved = localStorage.getItem('expenses');
+    if (saved) {
+      setExpenses(JSON.parse(saved));
+    } else {
+      setExpenses(initialExpenses);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (expenses.length > 0) {
+      localStorage.setItem('expenses', JSON.stringify(expenses));
+    }
+  }, [expenses]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -101,19 +114,22 @@ function Home() {
       amount: amountNum,
     };
 
-    setExpenses([newExpense, ...expenses]);
+    const updatedExpenses = [newExpense, ...expenses];
+    setExpenses(updatedExpenses);
+    localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
+
     setForm({ description: '', category: '', date: '', amount: '' });
     setErrors({ description: '', category: '', date: '', amount: '' });
   };
 
-  
   const handleRowClick = (id) => {
     setSelectedExpenseId(selectedExpenseId === id ? null : id);
   };
 
-  
   const confirmDelete = (id) => {
-    setExpenses(expenses.filter((expense) => expense.id !== id));
+    const updatedExpenses = expenses.filter((expense) => expense.id !== id);
+    setExpenses(updatedExpenses);
+    localStorage.setItem('expenses', JSON.stringify(updatedExpenses));
     setSelectedExpenseId(null);
   };
 
@@ -142,26 +158,18 @@ function Home() {
           <div className={styles.tableBody}>
             {expenses.map((exp) => (
               <div key={exp.id}>
-               <div 
-  className={styles.row} 
-  onClick={() => handleRowClick(exp.id)}
->
-  <div className={styles.cell}>{exp.description}</div>
-  <div className={styles.cell}>{exp.category}</div>
-  <div className={styles.cell}>{exp.date}</div>
-  <div className={styles.cell}>{exp.amount.toLocaleString()} ₽</div>
-  <div className={styles.cell} onClick={(e) => { e.stopPropagation(); confirmDelete(exp.id); }}>
-    <img src={trashIcon} alt="Удалить" style={{ width: '20px', height: '20px' }} />
-  </div>
-</div>
-                
-                {}
+                <div className={styles.row} onClick={() => handleRowClick(exp.id)}>
+                  <div className={styles.cell}>{exp.description}</div>
+                  <div className={styles.cell}>{exp.category}</div>
+                  <div className={styles.cell}>{exp.date}</div>
+                  <div className={styles.cell}>{exp.amount.toLocaleString()} ₽</div>
+                  <div className={styles.cell} onClick={(e) => { e.stopPropagation(); confirmDelete(exp.id); }}>
+                    <img src={trashIcon} alt="Удалить" style={{ width: '20px', height: '20px' }} />
+                  </div>
+                </div>
                 {selectedExpenseId === exp.id && (
                   <div className={styles.deleteRow}>
-                    <button 
-                      className={styles.deleteButton} 
-                      onClick={() => confirmDelete(exp.id)}
-                    >
+                    <button className={styles.deleteButton} onClick={() => confirmDelete(exp.id)}>
                       Удалить расход
                     </button>
                   </div>
@@ -246,7 +254,6 @@ function Home() {
         </div>
       </div>
 
-      {}
       <div className={styles.fabContainer}>
         <button className={styles.fab} onClick={() => navigate('/add-expense')}>
           <span className={styles.fabPlus}>+</span>

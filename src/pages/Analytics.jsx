@@ -1,7 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { CATEGORIES } from '../constants/categories';
 
 function Analytics() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      if (window.innerWidth <= 768) navigate('/analytics-mobile');
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, [navigate]);
+
   const today = new Date();
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth();
@@ -9,21 +21,23 @@ function Analytics() {
 
   const weekDays = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
 
-  const expensesData = [
-    { date: '2026-04-29', category: 'Еда', amount: 3590 },
-    { date: '2026-04-29', category: 'Транспорт', amount: 1835 },
-    { date: '2026-04-29', category: 'Жилье', amount: 0 },
-    { date: '2026-04-29', category: 'Развлечения', amount: 1250 },
-    { date: '2026-04-29', category: 'Образование', amount: 600 },
-    { date: '2026-04-29', category: 'Другое', amount: 2306 },
-  ];
+ 
+  const [expenses, setExpenses] = useState([]);
 
-  const categories = CATEGORIES.map(cat => cat.name);
-  const categoryColors = CATEGORIES.map(cat => cat.color);
-  const maxHeight = 328;
+  useEffect(() => {
+    const saved = localStorage.getItem('expenses');
+    if (saved) setExpenses(JSON.parse(saved));
+    else {
+      setExpenses([
+        { id: 1, description: 'Пятерочка', category: 'Еда', date: '03.07.2024', amount: 3500 },
+        { id: 2, description: 'Индекс Такси', category: 'Транспорт', date: '03.07.2024', amount: 730 },
+        { id: 3, description: 'Аптека Вита', category: 'Другое', date: '03.07.2024', amount: 1200 },
+      ]);
+    }
+  }, []);
 
+ 
   const [selectedPeriod, setSelectedPeriod] = useState({
-    type: 'day',
     startDate: new Date(currentYear, currentMonth, currentDay),
     endDate: new Date(currentYear, currentMonth, currentDay),
   });
@@ -31,19 +45,27 @@ function Analytics() {
   const [rangeStart, setRangeStart] = useState(null);
   const [isSelectingRange, setIsSelectingRange] = useState(false);
 
+  
   const getExpensesForPeriod = () => {
     if (!selectedPeriod) return [];
     const start = new Date(selectedPeriod.startDate);
     const end = new Date(selectedPeriod.endDate);
     start.setHours(0, 0, 0, 0);
     end.setHours(23, 59, 59, 999);
-    return expensesData.filter(exp => {
-      const expDate = new Date(exp.date);
+
+    return expenses.filter(exp => {
+      const [day, month, year] = exp.date.split('.');
+      const expDate = new Date(`${year}-${month}-${day}`);
       return expDate >= start && expDate <= end;
     });
   };
 
   const filteredExpenses = getExpensesForPeriod();
+
+  const categories = CATEGORIES.map(cat => cat.name);
+  const categoryColors = CATEGORIES.map(cat => cat.color);
+  const maxHeight = 328;
+
   const categoryAmounts = categories.map(cat =>
     filteredExpenses.filter(exp => exp.category === cat).reduce((sum, exp) => sum + exp.amount, 0)
   );
@@ -59,64 +81,12 @@ function Analytics() {
     if (!selectedPeriod) return 'выберите период';
     const start = selectedPeriod.startDate;
     const end = selectedPeriod.endDate;
-    if (start.toDateString() === end.toDateString()) {
+    if (start.toDateString() === end.toDateString())
       return `${start.getDate()} ${start.toLocaleString('ru', { month: 'long' })} ${start.getFullYear()} г.`;
-    }
     return `${start.getDate()} – ${end.getDate()} ${end.toLocaleString('ru', { month: 'long' })} ${end.getFullYear()} г.`;
   };
 
-  const enableRangeSelection = () => {
-    setIsSelectingRange(true);
-    setRangeStart(null);
-    setSelectedPeriod(null);
-  };
-
-  const handleDayClick = (day, month, year) => {
-    const clickedDate = new Date(year, month, day);
-
-    if (isSelectingRange) {
-      if (rangeStart === null) {
-        setRangeStart(clickedDate);
-      } else {
-        const start = new Date(rangeStart);
-        const end = new Date(clickedDate);
-        if (start > end) {
-          setSelectedPeriod({ type: 'range', startDate: end, endDate: start });
-        } else {
-          setSelectedPeriod({ type: 'range', startDate: start, endDate: end });
-        }
-        setIsSelectingRange(false);
-        setRangeStart(null);
-      }
-    } else {
-      setSelectedPeriod({ type: 'day', startDate: clickedDate, endDate: clickedDate });
-    }
-  };
-
-  const handleWeekClick = (week, month, year) => {
-    const validDays = week.filter(d => d !== null);
-    if (validDays.length === 0) return;
-    const startDay = validDays[0];
-    const endDay = validDays[validDays.length - 1];
-    const startDate = new Date(year, month, startDay);
-    const endDate = new Date(year, month, endDay);
-    setSelectedPeriod({ type: 'week', startDate, endDate });
-    setIsSelectingRange(false);
-    setRangeStart(null);
-  };
-
-  const isDateInRange = (day, month, year) => {
-    if (!selectedPeriod || selectedPeriod.type !== 'range') return false;
-    const date = new Date(year, month, day);
-    return date >= selectedPeriod.startDate && date <= selectedPeriod.endDate;
-  };
-
-  const isDateSelected = (day, month, year) => {
-    if (!selectedPeriod || selectedPeriod.type !== 'day') return false;
-    const date = new Date(year, month, day);
-    return selectedPeriod.startDate.toDateString() === date.toDateString();
-  };
-
+  
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
   const getFirstDayIndex = (year, month) => {
     const firstDay = new Date(year, month, 1).getDay();
@@ -131,14 +101,9 @@ function Analytics() {
     for (let week = 0; week < 6; week++) {
       const weekRow = [];
       for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
-        if (week === 0 && dayOfWeek < firstDayIndex) {
-          weekRow.push(null);
-        } else if (dayCounter <= daysInMonth) {
-          weekRow.push(dayCounter);
-          dayCounter++;
-        } else {
-          weekRow.push(null);
-        }
+        if (week === 0 && dayOfWeek < firstDayIndex) weekRow.push(null);
+        else if (dayCounter <= daysInMonth) weekRow.push(dayCounter++);
+        else weekRow.push(null);
       }
       daysGrid.push(weekRow);
       if (dayCounter > daysInMonth) break;
@@ -146,39 +111,61 @@ function Analytics() {
     return daysGrid;
   };
 
-  const currentMonthName = today.toLocaleString('ru', { month: 'long', year: 'numeric' });
-  const capitalizedMonth = currentMonthName.charAt(0).toUpperCase() + currentMonthName.slice(1);
-  const currentMonthGrid = generateMonthGrid(currentYear, currentMonth);
-
-  const nextMonth = currentMonth + 1;
-  const nextMonthYear = nextMonth > 11 ? currentYear + 1 : currentYear;
-  const nextMonthIndex = nextMonth > 11 ? 0 : nextMonth;
-  const nextMonthName = new Date(nextMonthYear, nextMonthIndex, 1).toLocaleString('ru', { month: 'long', year: 'numeric' });
-  const capitalizedNextMonth = nextMonthName.charAt(0).toUpperCase() + nextMonthName.slice(1);
-
-  const generateNextMonthContinuation = (year, month) => {
-    const daysInMonth = getDaysInMonth(year, month);
-    const firstDayIndex = getFirstDayIndex(year, month);
-    const lastWeekDays = [];
-    let dayCounter = 1;
-    for (let week = 0; week < 6; week++) {
-      const weekRow = [];
-      for (let dayOfWeek = 0; dayOfWeek < 7; dayOfWeek++) {
-        if (week === 0 && dayOfWeek < firstDayIndex) {
-          weekRow.push(null);
-        } else if (dayCounter <= daysInMonth) {
-          weekRow.push(dayCounter);
-          dayCounter++;
-        } else {
-          weekRow.push(null);
-        }
-      }
-      lastWeekDays.push(weekRow);
-      if (dayCounter > daysInMonth) break;
+  const getAllMonths = () => {
+    const months = [];
+    for (let i = -6; i <= 6; i++) {
+      const monthDate = new Date(currentYear, currentMonth + i, 1);
+      months.push({ year: monthDate.getFullYear(), month: monthDate.getMonth() });
     }
-    return lastWeekDays;
+    return months;
   };
-  const nextMonthGrid = generateNextMonthContinuation(nextMonthYear, nextMonthIndex);
+
+  const monthsList = getAllMonths();
+
+  const enableRangeSelection = () => {
+    setIsSelectingRange(prev => !prev);
+    setRangeStart(null);
+  };
+
+  const handleDayClick = (day, month, year) => {
+    const clickedDate = new Date(year, month, day);
+    if (isSelectingRange) {
+      if (!rangeStart) setRangeStart(clickedDate);
+      else {
+        const start = rangeStart;
+        const end = clickedDate;
+        if (start > end) setSelectedPeriod({ startDate: end, endDate: start });
+        else setSelectedPeriod({ startDate: start, endDate: end });
+        setIsSelectingRange(false);
+        setRangeStart(null);
+      }
+    } else {
+      setSelectedPeriod({ startDate: clickedDate, endDate: clickedDate });
+    }
+  };
+
+  const handleWeekClick = (week, month, year) => {
+    const validDays = week.filter(d => d !== null);
+    if (!validDays.length) return;
+    const startDate = new Date(year, month, validDays[0]);
+    const endDate = new Date(year, month, validDays[validDays.length - 1]);
+    setSelectedPeriod({ startDate, endDate });
+    setIsSelectingRange(false);
+    setRangeStart(null);
+  };
+
+  const isDateInRange = (day, month, year) => {
+    if (!isSelectingRange || !rangeStart) return false;
+    const current = new Date(year, month, day);
+    const start = new Date(rangeStart);
+    const end = new Date(rangeStart);
+    return current >= start && current <= end;
+  };
+
+  const isDateSelected = (day, month, year) => {
+    const date = new Date(year, month, day);
+    return selectedPeriod.startDate.toDateString() === date.toDateString();
+  };
 
   return (
     <div style={styles.page}>
@@ -192,75 +179,50 @@ function Analytics() {
               onClick={enableRangeSelection}
             >
               Период
-              {isSelectingRange && (
-                <span style={{ fontSize: '12px', marginLeft: '8px', color: '#7334EA' }}>
-                  {rangeStart === null ? ' выберите начало' : ' выберите конец'}
-                </span>
-              )}
+              {isSelectingRange && (rangeStart ? ' выберите конец' : ' выберите начало')}
             </div>
 
-            {}
             <div style={styles.weekDaysRow}>
               {weekDays.map(day => <div key={day} style={styles.weekDay}>{day}</div>)}
             </div>
 
-            {}
-            <div className="calendar-scroll" style={{ maxHeight: '380px', overflowY: 'auto', paddingRight: '4px' }}>
-              <div style={styles.monthTitle}>{capitalizedMonth}</div>
-              {currentMonthGrid.map((week, weekIdx) => (
-                <div key={weekIdx} style={styles.weekRow} onClick={() => handleWeekClick(week, currentMonth, currentYear)}>
-                  {week.map((day, dayIdx) => (
-                    <div
-                      key={dayIdx}
-                      style={{
-                        ...styles.calendarDay,
-                        backgroundColor: day
-                          ? isDateInRange(day, currentMonth, currentYear)
-                            ? '#D9B6FF'
-                            : isDateSelected(day, currentMonth, currentYear)
-                            ? '#7334EA'
-                            : '#F4F5F6'
-                          : 'transparent',
-                        color: day && isDateSelected(day, currentMonth, currentYear) ? '#FFFFFF' : '#000000',
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (day) handleDayClick(day, currentMonth, currentYear);
-                      }}
-                    >
-                      {day || ''}
-                    </div>
-                  ))}
-                </div>
-              ))}
-
-              <div style={styles.monthTitle}>{capitalizedNextMonth}</div>
-              {nextMonthGrid.map((week, weekIdx) => (
-                <div key={weekIdx} style={styles.weekRow} onClick={() => handleWeekClick(week, nextMonthIndex, nextMonthYear)}>
-                  {week.map((day, dayIdx) => (
-                    <div
-                      key={dayIdx}
-                      style={{
-                        ...styles.calendarDay,
-                        backgroundColor: day
-                          ? isDateInRange(day, nextMonthIndex, nextMonthYear)
-                            ? '#D9B6FF'
-                            : isDateSelected(day, nextMonthIndex, nextMonthYear)
-                            ? '#7334EA'
-                            : '#F4F5F6'
-                          : 'transparent',
-                        color: day && isDateSelected(day, nextMonthIndex, nextMonthYear) ? '#FFFFFF' : '#000000',
-                      }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (day) handleDayClick(day, nextMonthIndex, nextMonthYear);
-                      }}
-                    >
-                      {day || ''}
-                    </div>
-                  ))}
-                </div>
-              ))}
+            <div className="calendar-scroll" style={{ maxHeight: '380px', overflowY: 'auto' }}>
+              {monthsList.map(({ year, month }, idx) => {
+                const monthGrid = generateMonthGrid(year, month);
+                const monthName = new Date(year, month).toLocaleString('ru', { month: 'long', year: 'numeric' });
+                const capitalized = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+                return (
+                  <div key={idx}>
+                    <div style={styles.monthTitle}>{capitalized}</div>
+                    {monthGrid.map((week, weekIdx) => (
+                      <div key={weekIdx} style={styles.weekRow} onClick={() => handleWeekClick(week, month, year)}>
+                        {week.map((day, dayIdx) => (
+                          <div
+                            key={dayIdx}
+                            style={{
+                              ...styles.calendarDay,
+                              backgroundColor: day
+                                ? isDateInRange(day, month, year)
+                                  ? '#D9B6FF'
+                                  : isDateSelected(day, month, year)
+                                  ? '#7334EA'
+                                  : '#F4F5F6'
+                                : 'transparent',
+                              color: day && isDateSelected(day, month, year) ? '#FFF' : '#000',
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (day) handleDayClick(day, month, year);
+                            }}
+                          >
+                            {day || ''}
+                          </div>
+                        ))}
+                      </div>
+                    ))}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -286,170 +248,26 @@ function Analytics() {
 }
 
 const styles = {
-  page: {
-    width: '1440px',
-    margin: '0 auto',
-    minHeight: '100vh',
-    paddingTop: '100px',
-  },
-  pageTitle: {
-    width: '301px',
-    height: '48px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '700',
-    fontSize: '32px',
-    lineHeight: '150%',
-    letterSpacing: '0px',
-    color: '#000000',
-    marginTop: '0',
-    marginLeft: '120px',
-    marginBottom: '32px',
-  },
-  container: {
-    display: 'flex',
-    gap: '34px',
-    paddingLeft: '120px',
-    paddingRight: '120px',
-  },
+  page: { width: '1440px', margin: '0 auto', minHeight: '100vh', paddingTop: '100px' },
+  pageTitle: { width: '301px', height: '48px', fontFamily: 'Montserrat, sans-serif', fontWeight: '700', fontSize: '32px', color: '#000000', margin: '0 0 32px 120px' },
+  container: { display: 'flex', gap: '34px', padding: '0 120px' },
   leftColumn: { width: '379px' },
   rightColumn: { width: '789px' },
-  calendarCard: {
-    width: '379px',
-    height: '540px',
-    backgroundColor: '#FFFFFF',
-    borderRadius: '30px',
-    padding: '32px',
-    boxSizing: 'border-box',
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  periodTitle: {
-    width: '101px',
-    height: '29px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '700',
-    fontSize: '24px',
-    lineHeight: '100%',
-    letterSpacing: '0px',
-    textAlign: 'center',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#000000',
-    marginBottom: '24px',
-  },
-  weekDaysRow: {
-    display: 'flex',
-    gap: '6px',
-    marginBottom: '12px',
-    borderBottom: '0.5px solid #999999',
-    paddingBottom: '12px',
-  },
-  weekDay: {
-    width: '40px',
-    textAlign: 'center',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '400',
-    fontSize: '12px',
-    lineHeight: '100%',
-    color: '#999999',
-  },
-  monthTitle: {
-    width: '313px',
-    height: '20px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '600',
-    fontSize: '16px',
-    lineHeight: '100%',
-    letterSpacing: '0px',
-    color: '#000000',
-    marginTop: '24px',
-    marginBottom: '16px',
-  },
-  weekRow: {
-    display: 'flex',
-    gap: '6px',
-    cursor: 'pointer',
-    marginBottom: '6px',
-  },
-  calendarDay: {
-    width: '40px',
-    height: '40px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '400',
-    fontSize: '12px',
-    lineHeight: '100%',
-    borderRadius: '60px',
-    cursor: 'pointer',
-  },
-  statsCard: {
-    width: '789px',
-    height: '540px',
-    backgroundColor: '#FFFFFF',
-    borderRadius: '30px',
-    padding: '32px',
-    boxSizing: 'border-box',
-  },
-  totalAmount: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '700',
-    fontSize: '32px',
-    lineHeight: '100%',
-    color: '#000000',
-    marginBottom: '8px',
-  },
-  totalLabel: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '400',
-    fontSize: '14px',
-    color: '#999999',
-    marginBottom: '24px',
-  },
-  chartContainer: {
-    display: 'flex',
-  gap: '12px',
-  justifyContent: 'space-between',
-  alignItems: 'flex-end',
-  width: '100%',
-  height: '100%',  
-  
-  },
-  barWrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '12px',
-    width: '94px',
-    justifyContent: 'flex-end',
-    marginBottom: '60px',
-  },
-  barValue: {
-    width: '94px',
-    height: '20px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '600',
-    fontSize: '16px',
-    lineHeight: '100%',
-    letterSpacing: '0px',
-    textAlign: 'center',
-    color: '#000000',
-    marginBottom: '4px',
-  },
-  bar: {
-    width: '94px',
-    borderRadius: '12px',
-    transition: 'height 0.3s ease',
-  },
-  barLabel: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: '400',
-    fontSize: '12px',
-    textAlign: 'center',
-    color: '#000000',
-  },
+  calendarCard: { width: '379px', height: '540px', backgroundColor: '#FFFFFF', borderRadius: '30px', padding: '32px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column' },
+  periodTitle: { width: '101px', height: '29px', fontFamily: 'Montserrat, sans-serif', fontWeight: '700', fontSize: '24px', textAlign: 'center', color: '#000000', marginBottom: '24px' },
+  weekDaysRow: { display: 'flex', gap: '6px', marginBottom: '12px', borderBottom: '0.5px solid #999999', paddingBottom: '12px' },
+  weekDay: { width: '40px', textAlign: 'center', fontFamily: 'Montserrat, sans-serif', fontWeight: '400', fontSize: '12px', color: '#999999' },
+  monthTitle: { width: '313px', fontFamily: 'Montserrat, sans-serif', fontWeight: '600', fontSize: '16px', color: '#000000', margin: '24px 0 16px 0' },
+  weekRow: { display: 'flex', gap: '6px', cursor: 'pointer', marginBottom: '6px' },
+  calendarDay: { width: '40px', height: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Montserrat, sans-serif', fontWeight: '400', fontSize: '12px', borderRadius: '60px', cursor: 'pointer' },
+  statsCard: { width: '789px', height: '540px', backgroundColor: '#FFFFFF', borderRadius: '30px', padding: '32px', boxSizing: 'border-box' },
+  totalAmount: { fontFamily: 'Montserrat, sans-serif', fontWeight: '700', fontSize: '32px', color: '#000000', marginBottom: '8px' },
+  totalLabel: { fontFamily: 'Montserrat, sans-serif', fontWeight: '400', fontSize: '14px', color: '#999999', marginBottom: '24px' },
+  chartContainer: { display: 'flex', gap: '12px', justifyContent: 'space-between', alignItems: 'flex-end', width: '100%', height: '100%' },
+  barWrapper: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px', width: '94px', justifyContent: 'flex-end', marginBottom: '60px' },
+  barValue: { fontFamily: 'Montserrat, sans-serif', fontWeight: '600', fontSize: '16px', textAlign: 'center', color: '#000000', marginBottom: '4px' },
+  bar: { width: '94px', borderRadius: '12px', transition: 'height 0.3s ease' },
+  barLabel: { fontFamily: 'Montserrat, sans-serif', fontWeight: '400', fontSize: '12px', textAlign: 'center', color: '#000000' },
 };
 
 export default Analytics;

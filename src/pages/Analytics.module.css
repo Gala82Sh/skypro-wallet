@@ -1,0 +1,238 @@
+.page {
+  width: 1440px;
+  margin: 0 auto;
+  min-height: 100vh;
+  padding-top: 100px;
+}
+
+.pageTitle {
+  width: 301px;
+  height: 48px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 150%;
+  color: #000000;
+  margin: 0 0 32px 120px;
+}
+
+.container {
+  display: flex;
+  gap: 34px;
+  padding: 0 120px;
+}
+
+.leftColumn {
+  width: 379px;
+}
+
+.rightColumn {
+  width: 789px;
+}
+
+.calendarCard {
+  width: 379px;
+  height: 540px;
+  background-color: #ffffff;
+  border-radius: 30px;
+  padding: 32px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.periodTitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 100%;
+  text-align: center;
+  color: #000000;
+  margin-bottom: 24px;
+  cursor: pointer;
+}
+
+.weekDaysRow {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  border-bottom: 0.5px solid #999999;
+  padding-bottom: 12px;
+}
+
+.weekDay {
+  width: 40px;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: #999999;
+}
+
+.monthTitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  color: #000000;
+  margin: 24px 0 16px 0;
+}
+
+.weekRow {
+  display: flex;
+  gap: 6px;
+  cursor: pointer;
+  margin-bottom: 6px;
+}
+
+.calendarDay {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  border-radius: 60px;
+  cursor: pointer;
+}
+
+.statsCard {
+  width: 789px;
+  height: 540px;
+  background-color: #ffffff;
+  border-radius: 30px;
+  padding: 32px;
+  box-sizing: border-box;
+}
+
+.totalAmount {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 100%;
+  color: #000000;
+  margin-bottom: 8px;
+}
+
+.totalLabel {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  color: #999999;
+  margin-bottom: 24px;
+}
+
+.chartContainer {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.barWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 94px;
+  justify-content: flex-end;
+}
+
+.barValue {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 100%;
+  text-align: center;
+  color: #000000;
+}
+
+.bar {
+  width: 94px;
+  border-radius: 12px;
+  transition: height 0.3s ease;
+}
+
+.barLabel {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  text-align: center;
+  color: #000000;
+}
+
+@media (max-width: 768px) {
+  .page {
+    width: 100%;
+    max-width: 375px;
+    padding-top: 20px;
+    margin: 0 auto;
+  }
+
+  .pageTitle {
+    width: auto;
+    font-size: 24px;
+    text-align: center;
+    margin: 0 16px 16px 16px;
+  }
+
+  .container {
+    display: block;
+    padding: 0;
+  }
+
+  .leftColumn {
+    display: none;
+  }
+
+  .rightColumn {
+    width: 100%;
+  }
+
+  .statsCard {
+    width: 100%;
+    max-width: 375px;
+    margin: 0 auto;
+    padding: 16px;
+    border-radius: 0;
+    box-sizing: border-box;
+  }
+
+  .totalAmount {
+    font-size: 28px;
+    text-align: center;
+  }
+
+  .totalLabel {
+    text-align: center;
+    font-size: 12px;
+  }
+
+  .chartContainer {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 12px;
+    justify-content: flex-start;
+  }
+
+  .barWrapper {
+    width: 70px;
+    gap: 8px;
+  }
+
+  .bar {
+    width: 40px;
+  }
+
+  .barValue {
+    font-size: 12px;
+  }
+
+  .barLabel {
+    font-size: 10px;
+  }
+}

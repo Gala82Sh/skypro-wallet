@@ -1,0 +1,135 @@
+.page {
+  width: 100%;
+  max-width: 375px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  min-height: 100vh;
+  padding: 20px 16px;
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.backButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #000000;
+}
+
+.title {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: #000000;
+}
+
+.periodTitle {
+   font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  line-height: 100%;
+  letter-spacing: 0px;
+  text-align: left;
+  color: #000000;
+  margin: 12px 0 24px 0;   
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.weekDaysRow {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+  border-bottom: 0.5px solid #999999;
+  padding-bottom: 12px;
+}
+
+.weekDay {
+  width: 40px;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: #999999;
+}
+
+.monthTitle {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  margin: 24px 0 12px 0;
+  color: #000000;
+}
+
+.weekRow {
+  display: flex;
+  gap: 6px;
+  cursor: pointer;
+  margin-bottom: 6px;
+}
+
+.calendarDay {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  border-radius: 60px;
+  cursor: pointer;
+}
+
+.confirmButton {
+  width: 100%;
+  max-width: 343px;
+  height: 39px;
+  background-color: #7334EA;
+  border-radius: 6px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
+  margin: 32px auto 0 auto;
+  display: block;
+}
+
+.backLink {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.backIcon {
+  width: 11.66px;
+  height: 11.67px;
+}
+
+.backText {
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 150%;
+  letter-spacing: 0px;
+  text-align: center;
+  color: #999999;
+  white-space: nowrap;
+}
+
+.backText:hover {
+  text-decoration: underline;
+}
