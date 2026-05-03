@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../services/authService';
+import { loginAPI } from '../services/authService';
 import './Login.css';
 
 function Login() {
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '' });
+  const [form, setForm] = useState({ login: '', password: '' });
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
@@ -13,10 +13,10 @@ function Login() {
     setError('');
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      login(form.email, form.password);
+      await loginAPI(form.login, form.password);
       navigate('/');
     } catch (err) {
       setError(err.message);
@@ -29,10 +29,10 @@ function Login() {
 
       <form onSubmit={handleSubmit} className="login-form">
         <input
-          type="email"
-          name="email"
-          placeholder="Эл. почта"
-          value={form.email}
+          type="text"
+          name="login"
+          placeholder="Логин"
+          value={form.login}
           onChange={handleChange}
           className="login-input"
           required

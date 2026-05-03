@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CATEGORIES } from '../constants/categories';
+import styles from './AnalyticsMobile.module.css';
 
 function AnalyticsMobile() {
   const navigate = useNavigate();
 
   useEffect(() => {
     const checkDesktop = () => {
-      if (window.innerWidth > 768) navigate('/analytics');
+      if (window.innerWidth > 768) {
+        navigate('/analytics');
+      }
     };
     checkDesktop();
     window.addEventListener('resize', checkDesktop);
@@ -27,21 +30,24 @@ function AnalyticsMobile() {
 
   
   useEffect(() => {
-    const saved = localStorage.getItem('expenses');
-    if (saved) {
-      setExpenses(JSON.parse(saved));
-    } else {
-      setExpenses([
-        { id: 1, description: 'Пятерочка', category: 'Еда', date: '03.04.2026', amount: 3500 },
-        { id: 2, description: 'Индекс Такси', category: 'Транспорт', date: '29.04.2026', amount: 730 },
-        { id: 3, description: 'Аптека Вита', category: 'Другое', date: '30.04.2026', amount: 1200 },
-        { id: 4, description: 'Бургер Кинг', category: 'Еда', date: '01.05.2026', amount: 950 },
-        { id: 5, description: 'Деливери', category: 'Еда', date: '01.05.2026', amount: 1320 },
-        { id: 6, description: 'Кофейня №1', category: 'Еда', date: '30.04.2026', amount: 400 },
-        { id: 7, description: 'Бильярд', category: 'Развлечения', date: '27.04.2026', amount: 600 },
-        { id: 8, description: 'Перекресток', category: 'Еда', date: '29.04.2026', amount: 2360 },
-      ]);
-    }
+    const loadExpenses = () => {
+      const saved = localStorage.getItem('expenses');
+      if (saved) {
+        setExpenses(JSON.parse(saved));
+      } else {
+        setExpenses([
+          { id: 1, description: 'Пятерочка', category: 'Еда', date: '03.04.2026', amount: 3500 },
+          { id: 2, description: 'Индекс Такси', category: 'Транспорт', date: '29.04.2026', amount: 730 },
+          { id: 3, description: 'Аптека Вита', category: 'Другое', date: '30.04.2026', amount: 1200 },
+          { id: 4, description: 'Бургер Кинг', category: 'Еда', date: '01.05.2026', amount: 950 },
+          { id: 5, description: 'Деливери', category: 'Еда', date: '01.05.2026', amount: 1320 },
+          { id: 6, description: 'Кофейня №1', category: 'Еда', date: '30.04.2026', amount: 400 },
+          { id: 7, description: 'Бильярд', category: 'Развлечения', date: '27.04.2026', amount: 600 },
+          { id: 8, description: 'Перекресток', category: 'Еда', date: '29.04.2026', amount: 2360 },
+        ]);
+      }
+    };
+    loadExpenses();
   }, []);
 
   
@@ -95,141 +101,42 @@ function AnalyticsMobile() {
   };
 
   return (
-    <div style={styles.page}>
-      <h1 style={styles.title}>Анализ расходов</h1>
+    <div className={styles['mobile-analytics-page']}>
+      <h1 className={styles['mobile-analytics-title']}>Анализ расходов</h1>
 
-      <div style={styles.summary}>
-        <div style={styles.total}>{totalAmount.toLocaleString()} ₽</div>
-        <div style={styles.periodLabel}>
-          <span style={styles.periodText}>Расходы за </span>
-          <span style={styles.periodDate}>{formatDate()}</span>
-        </div>
+      <div className={styles['mobile-analytics-summary']}>
+        <div className={styles['mobile-analytics-total']}>{totalAmount.toLocaleString()} ₽</div>
+        <div className={styles['mobile-analytics-period']}>{formatDate()}</div>
       </div>
 
-      <div style={styles.chartContainer}>
+      <div className={styles['mobile-analytics-chart']}>
         {categories.map((cat, idx) => (
-          <div key={cat} style={styles.barWrapper}>
-            <div style={styles.barValue}>{categoryAmounts[idx].toLocaleString()} ₽</div>
-            <div style={{ ...styles.bar, height: `${getColumnHeight(categoryAmounts[idx])}px`, backgroundColor: categoryColors[idx] }} />
-            <div style={styles.barLabel}>{cat}</div>
-          </div>
+          <div key={cat} className={styles['mobile-analytics-bar-wrapper']}>
+  <div className={styles['mobile-analytics-bar-value']}>{categoryAmounts[idx].toLocaleString()} ₽</div>
+  <div className={styles['mobile-analytics-bar-container']}>
+    <div
+      className={styles['mobile-analytics-bar']}
+      style={{
+        height: `${getColumnHeight(categoryAmounts[idx])}px`,
+        backgroundColor: categoryColors[idx],
+      }}
+    />
+  </div>
+  <div className={styles['mobile-analytics-bar-label']}>{cat}</div>
+</div>
         ))}
       </div>
 
-      <button style={styles.button} onClick={() => navigate('/calendar')}>
-        Выбрать другой период
-      </button>
+      <div className={styles['mobile-analytics-button-container']}>
+        <button
+          className={styles['mobile-analytics-button']}
+          onClick={() => navigate('/calendar')}
+        >
+          Выбрать другой период
+        </button>
+      </div>
     </div>
   );
 }
-
-const styles = {
-  page: {
-    width: '100%',
-    maxWidth: '375px',
-    margin: '0 auto',
-    backgroundColor: '#ffffff',
-    minHeight: '100vh',
-    padding: '20px 16px 40px 16px',
-    boxSizing: 'border-box',
-  },
-  title: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: 700,
-    fontSize: '24px',
-    lineHeight: '100%',
-    textAlign: 'left',
-    color: '#000000',
-    margin: '0 0 24px 0',
-  },
-  summary: {
-    textAlign: 'left',
-    marginBottom: '24px',
-  },
-  total: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: 700,
-    fontSize: '20px',
-    lineHeight: '100%',
-    letterSpacing: '0px',
-    color: '#000000',
-    marginBottom: '8px',
-  },
-  periodLabel: {
-    textAlign: 'left',
-    marginBottom: '24px',
-  },
-  periodText: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: 400,
-    fontSize: '12px',
-    lineHeight: '100%',
-    letterSpacing: '0px',
-    color: '#999999',
-  },
-  periodDate: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: 600,
-    fontSize: '12px',
-    lineHeight: '100%',
-    letterSpacing: '0px',
-    color: '#999999',
-  },
-  chartContainer: {
-    display: 'flex',
-    flexWrap: 'nowrap',
-    justifyContent: 'space-between',
-    gap: '6px',
-    width: '100%',
-    overflowX: 'hidden',
-    marginBottom: '24px',
-  },
-  barWrapper: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '4px',
-    width: '52px',
-    flexShrink: 0,
-    justifyContent: 'flex-end',
-  },
-  barValue: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: 600,
-    fontSize: '12px',
-    lineHeight: '100%',
-    textAlign: 'center',
-    color: '#000000',
-  },
-  bar: {
-    width: '40px',
-    borderRadius: '12px',
-    transition: 'height 0.3s ease',
-  },
-  barLabel: {
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: 400,
-    fontSize: '10px',
-    textAlign: 'center',
-    color: '#000000',
-  },
-  button: {
-    width: '343px',
-    height: '39px',
-    backgroundColor: '#7334EA',
-    borderRadius: '6px',
-    padding: '12px',
-    fontFamily: 'Montserrat, sans-serif',
-    fontWeight: 600,
-    fontSize: '12px',
-    lineHeight: '100%',
-    color: '#ffffff',
-    textAlign: 'center',
-    border: 'none',
-    cursor: 'pointer',
-    margin: '0 auto',
-    display: 'block',
-  },
-};
 
 export default AnalyticsMobile;

@@ -11,12 +11,9 @@ function CalendarPage() {
 
   const weekDays = ['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'];
 
-  const [selectedPeriod, setSelectedPeriod] = useState({
-    startDate: new Date(currentYear, currentMonth, currentDay),
-    endDate: new Date(currentYear, currentMonth, currentDay),
-  });
   const [rangeStart, setRangeStart] = useState(null);
-  const [isSelectingRange, setIsSelectingRange] = useState(false);
+  const [rangeEnd, setRangeEnd] = useState(null);
+  const [isRangeMode, setIsRangeMode] = useState(false);
   const [currentCalendarYear, setCurrentCalendarYear] = useState(currentYear);
   const [currentCalendarMonth, setCurrentCalendarMonth] = useState(currentMonth);
 
@@ -68,41 +65,49 @@ function CalendarPage() {
   };
 
   const isDateInRange = (day, month, year) => {
-    if (!isSelectingRange || rangeStart === null) return false;
-    const currentDate = new Date(year, month, day);
-    const start = new Date(rangeStart);
-    const end = new Date(rangeStart);
-    if (currentDate >= start && currentDate <= end) return true;
-    return false;
+    if (!rangeStart || !rangeEnd) return false;
+    const date = new Date(year, month, day);
+    return date > rangeStart && date < rangeEnd;
+  };
+
+  const isDateStart = (day, month, year) => {
+    if (!rangeStart) return false;
+    const date = new Date(year, month, day);
+    return rangeStart.toDateString() === date.toDateString();
+  };
+
+  const isDateEnd = (day, month, year) => {
+    if (!rangeEnd) return false;
+    const date = new Date(year, month, day);
+    return rangeEnd.toDateString() === date.toDateString();
   };
 
   const handleDayClick = (day, month, year) => {
     const clickedDate = new Date(year, month, day);
-    if (isSelectingRange) {
-      if (rangeStart === null) {
-        setRangeStart(clickedDate);
-      } else {
-        const start = new Date(rangeStart);
-        const end = new Date(clickedDate);
-        let newStart, newEnd;
-        if (start > end) {
-          newStart = end;
-          newEnd = start;
-        } else {
-          newStart = start;
-          newEnd = end;
-        }
-        setSelectedPeriod({ startDate: newStart, endDate: newEnd });
-       
-        localStorage.setItem('selectedPeriodStart', newStart.toISOString());
-        localStorage.setItem('selectedPeriodEnd', newEnd.toISOString());
-        navigate('/analytics-mobile');
-      }
-    } else {
-      setSelectedPeriod({ startDate: clickedDate, endDate: clickedDate });
+    if (!isRangeMode) {
+      
       localStorage.setItem('selectedPeriodStart', clickedDate.toISOString());
       localStorage.setItem('selectedPeriodEnd', clickedDate.toISOString());
       navigate('/analytics-mobile');
+    } else {
+      
+      if (!rangeStart) {
+        setRangeStart(clickedDate);
+        setRangeEnd(null);
+      } else if (!rangeEnd) {
+        let start, end;
+        if (rangeStart > clickedDate) {
+          start = clickedDate;
+          end = rangeStart;
+        } else {
+          start = rangeStart;
+          end = clickedDate;
+        }
+        setRangeEnd(end);
+        localStorage.setItem('selectedPeriodStart', start.toISOString());
+        localStorage.setItem('selectedPeriodEnd', end.toISOString());
+        navigate('/analytics-mobile');
+      }
     }
   };
 
@@ -113,15 +118,8 @@ function CalendarPage() {
     const endDay = validDays[validDays.length - 1];
     const startDate = new Date(year, month, startDay);
     const endDate = new Date(year, month, endDay);
-    setSelectedPeriod({ startDate, endDate });
     localStorage.setItem('selectedPeriodStart', startDate.toISOString());
     localStorage.setItem('selectedPeriodEnd', endDate.toISOString());
-    navigate('/analytics-mobile');
-  };
-
-  const handleConfirm = () => {
-    localStorage.setItem('selectedPeriodStart', selectedPeriod.startDate.toISOString());
-    localStorage.setItem('selectedPeriodEnd', selectedPeriod.endDate.toISOString());
     navigate('/analytics-mobile');
   };
 
@@ -151,12 +149,16 @@ function CalendarPage() {
 
       <div
         className={stylesCalendar.periodTitle}
-        onClick={() => setIsSelectingRange(!isSelectingRange)}
+        onClick={() => {
+          setIsRangeMode(!isRangeMode);
+          setRangeStart(null);
+          setRangeEnd(null);
+        }}
       >
-        Выбор периода
-        {isSelectingRange && (
+        {isRangeMode ? 'Выбор диапазона' : 'Выбор дня'}
+        {isRangeMode && (
           <span style={{ fontSize: '12px', marginLeft: '8px', color: '#7334EA' }}>
-            {rangeStart === null ? ' выберите начало' : ' выберите конец'}
+            {!rangeStart ? ' выберите начало' : !rangeEnd ? ' выберите конец' : ''}
           </span>
         )}
       </div>
@@ -183,8 +185,11 @@ function CalendarPage() {
                         backgroundColor: day
                           ? isDateInRange(day, month, year)
                             ? '#D9B6FF'
+                            : isDateStart(day, month, year) || isDateEnd(day, month, year)
+                            ? '#7334EA'
                             : '#F4F5F6'
                           : 'transparent',
+                        color: day && (isDateStart(day, month, year) || isDateEnd(day, month, year)) ? '#FFFFFF' : '#000000',
                       }}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -200,10 +205,6 @@ function CalendarPage() {
           );
         })}
       </div>
-
-      <button className={stylesCalendar.confirmButton} onClick={handleConfirm}>
-        Выбрать период
-      </button>
     </div>
   );
 }

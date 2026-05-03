@@ -34,15 +34,18 @@ function Home() {
   });
   const [selectedExpenseId, setSelectedExpenseId] = useState(null);
 
-  
+ 
   useEffect(() => {
-    const saved = transactionsApi.getAll();
-    if (saved.length > 0) {
-      setExpenses(saved);
-    } else {
-      setExpenses(initialExpenses);
-      localStorage.setItem('expenses', JSON.stringify(initialExpenses));
-    }
+    const loadExpenses = async () => {
+      const saved = await transactionsApi.getAll();
+      if (saved.length > 0) {
+        setExpenses(saved);
+      } else {
+        setExpenses(initialExpenses);
+        localStorage.setItem('expenses', JSON.stringify(initialExpenses));
+      }
+    };
+    loadExpenses();
   }, []);
 
   
@@ -67,7 +70,7 @@ function Home() {
     }
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const newErrors = {
       description: '',
       category: '',
@@ -117,7 +120,7 @@ function Home() {
       amount: amountNum,
     };
 
-    const updatedExpenses = transactionsApi.add(newExpense);
+    const updatedExpenses = await transactionsApi.add(newExpense);
     setExpenses(updatedExpenses);
 
     setForm({ description: '', category: '', date: '', amount: '' });
@@ -128,8 +131,8 @@ function Home() {
     setSelectedExpenseId(selectedExpenseId === id ? null : id);
   };
 
-  const confirmDelete = (id) => {
-    const updatedExpenses = transactionsApi.remove(id);
+  const confirmDelete = async (id) => {
+    const updatedExpenses = await transactionsApi.remove(id);
     setExpenses(updatedExpenses);
     setSelectedExpenseId(null);
   };

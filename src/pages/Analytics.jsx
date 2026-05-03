@@ -24,13 +24,29 @@ function Analytics() {
 
   const [expenses, setExpenses] = useState([]);
 
-  
-  useEffect(() => {
-    const saved = transactionsApi.getAll();
-    setExpenses(saved);
-  }, []);
-
  
+ useEffect(() => {
+  const loadExpenses = () => {
+    const saved = localStorage.getItem('expenses');
+    if (saved) {
+      setExpenses(JSON.parse(saved));
+    } else {
+      
+      setExpenses([
+        { id: 1, description: 'Пятерочка', category: 'Еда', date: '03.04.2026', amount: 3500 },
+        { id: 2, description: 'Индекс Такси', category: 'Транспорт', date: '29.04.2026', amount: 730 },
+        { id: 3, description: 'Аптека Вита', category: 'Другое', date: '30.04.2026', amount: 1200 },
+        { id: 4, description: 'Бургер Кинг', category: 'Еда', date: '01.05.2026', amount: 950 },
+        { id: 5, description: 'Деливери', category: 'Еда', date: '01.05.2026', amount: 1320 },
+        { id: 6, description: 'Кофейня №1', category: 'Еда', date: '30.04.2026', amount: 400 },
+        { id: 7, description: 'Бильярд', category: 'Развлечения', date: '27.04.2026', amount: 600 },
+        { id: 8, description: 'Перекресток', category: 'Еда', date: '29.04.2026', amount: 2360 },
+      ]);
+    }
+  };
+  loadExpenses();
+}, []);
+
   const [selectedPeriod, setSelectedPeriod] = useState({
     startDate: new Date(currentYear, currentMonth, currentDay),
     endDate: new Date(currentYear, currentMonth, currentDay),
@@ -42,7 +58,6 @@ function Analytics() {
   const categoryColors = CATEGORIES.map(cat => cat.color);
   const maxHeight = 328;
 
- 
   const getExpensesForPeriod = () => {
     if (!selectedPeriod) return [];
     const start = new Date(selectedPeriod.startDate);
@@ -78,7 +93,6 @@ function Analytics() {
     return `${start.getDate()} – ${end.getDate()} ${end.toLocaleString('ru', { month: 'long' })} ${end.getFullYear()} г.`;
   };
 
- 
   const getDaysInMonth = (year, month) => new Date(year, month + 1, 0).getDate();
   const getFirstDayIndex = (year, month) => {
     const firstDay = new Date(year, month, 1).getDay();
